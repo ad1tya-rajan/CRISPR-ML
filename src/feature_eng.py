@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+from data_processing import process_data
+
 def get_gc_content(sequence):
     
     """
@@ -28,8 +30,9 @@ def extract_features(input_path, output_path):
     output_path (str): The file path where the output CSV with features will be saved.
 
     """
-    
-    data = pd.read_csv(input_path)
+    processed_path = r'C:\Users\adity\Projects\CRISPR-ML\data\processed\processed_guideseq.csv'
+    process_data(input_path, processed_path)
+    data = pd.read_csv(processed_path)
 
     data['Guide_Length'] = data['On'].apply(len)
     data['On_GC_Content'] = data['On'].apply(get_gc_content)
@@ -39,7 +42,7 @@ def extract_features(input_path, output_path):
     print(f"Features saved successfully to {output_path}")
 
 if __name__ == "__main__":
-    input_path = 'data/raw/guideseq.csv'
-    output_path = 'data/processed/guideseq_features.csv'
+    input_path = r'C:\Users\adity\Projects\CRISPR-ML\data\raw\guideseq.csv'
+    output_path = r'C:\Users\adity\Projects\CRISPR-ML\data\processed\features_guideseq.csv'
     extract_features(input_path, output_path)
     
