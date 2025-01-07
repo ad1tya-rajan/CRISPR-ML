@@ -8,8 +8,18 @@ input_path = "data/raw/guideseq.csv"
 output_path = "data/processed/processed_guideseq.csv"
 
 def process_data(input_path, output_path):
-    print("Loading data...")
+    
+    """
+    Processes guide sequence data by performing data cleaning, validation, normalization, and encoding, 
+    then saves the processed data to a CSV file.
 
+    Parameters:
+    input_path (str): The file path to the input CSV containing raw guide sequence data.
+    output_path (str): The file path where the processed CSV data will be saved.
+
+    """
+    print("Loading data...")
+    
     try:
         data = pd.read_csv(input_path)
         print(f"Dataset loaded successfully, with dim. {data.shape}")
