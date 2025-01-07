@@ -31,8 +31,9 @@ def extract_features(input_path, output_path):
     
     data = pd.read_csv(input_path)
 
-    data['Guide_Length'] = data['Guide_Sequence'].apply(len)
-    data['Guide_Length'] = data['Guide_Sequence'].apply(get_gc_content)
+    data['Guide_Length'] = data['On'].apply(len)
+    data['On_GC_Content'] = data['On'].apply(get_gc_content)
+    data['Off_GC_Content'] = data['Off'].apply(get_gc_content)
 
     data.to_csv(output_path, index = False)
     print(f"Features saved successfully to {output_path}")

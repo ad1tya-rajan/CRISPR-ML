@@ -38,7 +38,7 @@ def process_data(input_path, output_path):
     if 'Reads' in data.columns:
         print("Normalising 'Reads' column")
         scaler = MinMaxScaler()
-        data['Reads'] = scaler.fit_transorm(data['Reads'])
+        data['Reads'] = scaler.fit_transform(data['Reads'].values.reshape(-1, 1))
 
     if 'Active' in data.columns:
         print("One-hot encoding 'Active' column")
