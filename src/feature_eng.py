@@ -3,6 +3,47 @@ import numpy as np
 
 from data_processing import process_data
 
+#TODO: levenshtein distance works in feature_eng, but not in eda - fix 
+
+def levenshtein_distance(seq1, seq2):
+
+    """
+    Computes the Levenshtein distance between two sequences.
+
+    Parameters
+    ----------
+    seq1 (str): The first sequence.
+    seq2 (str): The second sequence.
+
+    Returns
+    -------
+    int: The Levenshtein distance between the two sequences.
+
+    """
+
+    len1 = len(seq1)
+    len2 = len(seq2)
+
+    dp = np.zeros((len1 + 1, len2 + 1), dtype=int)      # 2D array for dynamic programming
+
+    for i in range(len1 + 1):
+        dp[i][0] = i
+
+    for j in range(len2 + 1):
+        dp[0][j] = j
+
+    for i in range(1, len1 + 1):
+        for j in range(1, len2 + 1):
+            if seq1[i - 1] == seq2[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1]
+            else:
+                dp[i][j] = min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]) + 1
+
+    return dp[len1][len2]
+
+def get_lev_distance(row):
+    return levenshtein_distance(row['On'], row['Off'])
+
 def get_gc_content(sequence):
     
     """
@@ -37,6 +78,7 @@ def extract_features(input_path, output_path):
     data['Guide_Length'] = data['On'].apply(len)
     data['On_GC_Content'] = data['On'].apply(get_gc_content)
     data['Off_GC_Content'] = data['Off'].apply(get_gc_content)
+    data['Levenshtein_Distance'] = data.apply(get_lev_distance, axis = 1)
 
     data.to_csv(output_path, index = False)
     print(f"Features saved successfully to {output_path}")
