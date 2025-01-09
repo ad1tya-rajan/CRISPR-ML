@@ -9,26 +9,50 @@ from feature_eng import extract_features
 from data_processing import process_data
 
 # TODO:
-#! dont need to process before extracting features, proc done during feature extraction
-#! value error caused in model training, not feature extraction -> one-hot encode sequence to arrays (eg: A = [1, 0, 0, 0] in proc)
+
+#! possible overfitting in baseline models - fix using data shuffling, augmentation, dropout/regularisation/batch normalisation
 
 def load_dataset(path):
 
     print("Loading dataset...")
-
-    processed_path = r'C:\Users\adity\Projects\CRISPR-ML\data\processed\processed_guideseq.csv'
+    
     features_path = r'C:\Users\adity\Projects\CRISPR-ML\data\processed\features_guideseq.csv'
 
-    process_data(path, processed_path)
-    extract_features(processed_path, features_path)
+    extract_features(path, features_path);
 
     data = pd.read_csv(features_path)
     X = data.drop('Active', axis = 1)
-    y = data['Active']
+    y = data['Active'].values.ravel()
+    print(y.shape)
     return X, y
 
+def one_hot(sequence):
+    mapping = {'A' : [1,0,0,0], 'C' : [0,1,0,0], 'G' : [0,0,1,0], 'T' : [0,0,0,1]}
+    encoded = [mapping[char] for char in sequence if char in mapping]
+    return np.array(encoded).flatten()
+
+def one_hot_encode(X, sequence_cols):
+    encoded_features = []
+
+    for col in sequence_cols:
+        encoded = X[col].apply(one_hot) 
+        max_length = max(encoded.map(len))
+
+        encoded = encoded.apply(lambda sequence: np.pad(sequence, (0, max_length - len(sequence)), constant_values = 0))
+        encoded_features.append(np.stack(encoded))
+
+    encoded_features = np.concatenate(encoded_features, axis = 1)
+    X = X.drop(columns = sequence_cols).reset_index(drop = True)
+    X = pd.concat([X, pd.DataFrame(encoded_features)], axis=1)
+    X.columns = X.columns.astype(str)
+
+    return X
+
+
 def split_dataset(X, y, test_size = 0.2, random_state = 42):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = test_size, random_state = random_state)
+    print(y_train.shape)
+    print(y_test.shape)
     return X_train, X_test, y_train, y_test
 
 def train_logistic_regression(X_train, y_train, X_test, y_test):
@@ -65,7 +89,9 @@ def main():
     path = r'C:\Users\adity\Projects\CRISPR-ML\data\raw\guideseq.csv'
     X, y = load_dataset(path)
 
-    X_train, y_train, X_test, y_test = split_dataset(X, y)
+    X = one_hot_encode(X, ['On', 'Off'])
+
+    X_train, X_test, y_train, y_test = split_dataset(X, y)
 
     LR_model = train_logistic_regression(X_train, y_train, X_test, y_test)
     XGB_model = train_xgboost(X_train, y_train, X_test, y_test)
