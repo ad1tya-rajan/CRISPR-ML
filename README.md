@@ -8,7 +8,7 @@ This project, **CRISPR-ML**, leverages machine learning to predict off-target ef
 ## What is CRISPR?
 [CRISPR](https://en.wikipedia.org/wiki/CRISPR) (Clustered Regularly Interspaced Short Palindromic Repeats) is a natural system bacteria use to defend against viruses. Scientists have adapted this system for genome editing, combining it with the Cas9 protein to "cut" DNA at specific locations. This is achieved by designing a guide RNA (gRNA) that matches the target DNA sequence.
 
-![CRISPR](images/crispr_img.jpeg)
+![CRISPR](images/crispr_img.jpg)
 
 ### Off-Target Effects
 While CRISPR-Cas9 is highly specific, it is not perfect. Off-target effects occur when the Cas9 protein cuts DNA at unintended sites, which may:
