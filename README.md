@@ -3,10 +3,10 @@
 ## Overview
 CRISPR-Cas9 is a revolutionary genome-editing tool that allows scientists to make precise edits to DNA. This technology has broad applications in medicine, agriculture, and biotechnology. However, its accuracy is not perfect, and unintended edits ("off-target effects") can occur, leading to potential risks such as undesired mutations or harmful side effects.
 
-This project, **CRISPR-ML**, leverages machine learning to predict off-target effects of CRISPR-Cas9 editing. By analyzing DNA sequences and associated data, this project aims to improve the safety and reliability of CRISPR applications.
+This project, **CRISPR-ML**, leverages machine learning to predict off-target effects of CRISPR-Cas9 editing. By analyzing guide RNA (gRNA) sequences and associated data, this project aims to improve the safety and reliability of CRISPR applications.
 
 ## What is CRISPR?
-[CRISPR](https://en.wikipedia.org/wiki/CRISPR) (Clustered Regularly Interspaced Short Palindromic Repeats) is a natural system bacteria use to defend against viruses. Scientists have adapted this system for genome editing, combining it with the Cas9 protein to "cut" DNA at specific locations. This is achieved by designing a guide RNA (gRNA) that matches the target DNA sequence.
+[CRISPR](https://en.wikipedia.org/wiki/CRISPR) (Clustered Regularly Interspaced Short Palindromic Repeats) is a natural system bacteria use to defend against viruses. Scientists have adapted this system for genome editing, combining it with the Cas9 protein to "cut" DNA at specific locations. This is achieved by designing a gRNA that matches the target DNA sequence.
 
 ![CRISPR](images/crispr_img.jpg)
 
