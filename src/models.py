@@ -1,16 +1,19 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
+
 import xgboost as xgb
+from xgboost import cv, DMatrix
 
 from feature_eng import extract_features
 from data_processing import process_data
 
 # TODO:
 
-#! possible overfitting in baseline models - fix using data shuffling, augmentation, dropout/regularisation/batch normalisation
+#! overfitting in baseline models - fix using data shuffling, augmentation, dropout/regularisation/batch normalisation
 
 def load_dataset(path):
 
@@ -57,8 +60,12 @@ def split_dataset(X, y, test_size = 0.2, random_state = 42):
 
 def train_logistic_regression(X_train, y_train, X_test, y_test):
 
-    print("Training Logistic Regression model (baseline model 1)...")
-    model = LogisticRegression(max_iter = 1000, random_state = 42)
+    print("Training Logistic Regression model (baseline model 1) w/ Cross-Validation...")
+    model = LogisticRegression(max_iter = 1000, random_state = 42, C = 0.1, penalty = 12)
+    scores = cross_val_score(model, X_train, y_train, cv = 5, scoring = 'accuracy')
+
+    print("Cross-validated accuracy: ", scores.mean())
+    
     model.fit(X_train, y_train)
 
     predictions = model.predict(X_test)
@@ -73,11 +80,32 @@ def train_logistic_regression(X_train, y_train, X_test, y_test):
 def train_xgboost(X_train, y_train, X_test, y_test):
 
     print("Training XGBoost model (baseline model 2)...")
-    model = xgb.XGBClassifier(random_state = 42)
-    model.fit(X_train, y_train)
 
-    predictions = model.predict(X_test)
-    probabilities = model.predict_proba(X_test)[:, 1]
+    d_train = xgb.DMatrix(X_train, label = y_train)
+    d_test = xgb.DMatrix(X_test, label = y_test)
+
+    params = {
+        'objective' : 'binary:logistic',
+        'eval_matric' : 'auc',
+        'max_depth' : 6,
+        'learning_rate' : 0.1,
+        'lambda' : 1.0,
+        'alpha' : 1.0,
+        'seed' : 42
+    }
+
+    evals = [(d_train, 'train'), (d_test, 'test')]
+
+    model = xgb.train(
+        params,
+        d_train,
+        num_boost_round = 100,
+        evals = evals,
+        early_stopping_rounds = 10
+    )
+
+    predictions = model.predict(d_test) > 0.5
+    probabilities = model.predict(d_test)
 
     print("Accuracy:", accuracy_score(y_test, predictions))
     print("ROC-AUC Score:", roc_auc_score(y_test, probabilities))
@@ -93,7 +121,7 @@ def main():
 
     X_train, X_test, y_train, y_test = split_dataset(X, y)
 
-    LR_model = train_logistic_regression(X_train, y_train, X_test, y_test)
+    #LR_model = train_logistic_regression(X_train, y_train, X_test, y_test)
     XGB_model = train_xgboost(X_train, y_train, X_test, y_test)
 
 if __name__ == "__main__":
